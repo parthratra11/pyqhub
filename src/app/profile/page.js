@@ -63,6 +63,16 @@ const ProfilePage = () => {
     ],
   };
 
+  const [isEditingSocial, setIsEditingSocial] = useState(false);
+  const [editedSocialLinks, setEditedSocialLinks] = useState({
+    ...userData.socialLinks,
+  });
+
+  const handleSocialUpdate = () => {
+    // Here you would typically update the backend
+    setIsEditingSocial(false);
+  };
+
   const renderHeader = () => (
     <div className="max-w-6xl mx-auto bg-[#161622] rounded-lg p-6 mb-6">
       <div className="flex items-center gap-6">
@@ -75,7 +85,7 @@ const ProfilePage = () => {
           </button>
         </div>
         <div className="flex-1">
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col gap-4">
             <div>
               <h1 className="text-3xl font-bold group">
                 {userData.name}
@@ -86,20 +96,80 @@ const ProfilePage = () => {
                 <FaEdit className="inline-block ml-2 opacity-0 group-hover:opacity-100 cursor-pointer text-blue-500" />
               </p>
             </div>
-            <div className="flex gap-4">
-              {Object.entries(userData.socialLinks).map(([platform, link]) => (
-                <a
-                  key={platform}
-                  href={`https://${link}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-2xl hover:text-blue-500 transition-colors"
+
+            <div className="bg-[#1f1f2f] p-4 rounded-lg">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Social Links</h3>
+                <button
+                  onClick={() => setIsEditingSocial(!isEditingSocial)}
+                  className="text-blue-500 hover:text-blue-400"
                 >
-                  {platform === "github" && <FaGithub />}
-                  {platform === "linkedin" && <FaLinkedin />}
-                  {platform === "twitter" && <FaTwitter />}
-                </a>
-              ))}
+                  {isEditingSocial ? "Done" : <FaEdit />}
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {Object.entries(userData.socialLinks).map(
+                  ([platform, link]) => (
+                    <div key={platform} className="flex items-center gap-3">
+                      <div className="w-8">
+                        {platform === "github" && (
+                          <FaGithub className="text-xl" />
+                        )}
+                        {platform === "linkedin" && (
+                          <FaLinkedin className="text-xl" />
+                        )}
+                        {platform === "twitter" && (
+                          <FaTwitter className="text-xl" />
+                        )}
+                      </div>
+
+                      {isEditingSocial ? (
+                        <input
+                          type="text"
+                          value={editedSocialLinks[platform]}
+                          onChange={(e) =>
+                            setEditedSocialLinks({
+                              ...editedSocialLinks,
+                              [platform]: e.target.value,
+                            })
+                          }
+                          className="flex-1 bg-[#161622] border border-gray-700 rounded px-2 py-1 text-sm"
+                        />
+                      ) : (
+                        <a
+                          href={`https://${link}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-gray-400 hover:text-blue-500 transition-colors"
+                        >
+                          {link}
+                        </a>
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+
+              {isEditingSocial && (
+                <div className="flex justify-end mt-3 gap-2">
+                  <button
+                    onClick={() => {
+                      setEditedSocialLinks({ ...userData.socialLinks });
+                      setIsEditingSocial(false);
+                    }}
+                    className="px-3 py-1 text-sm rounded bg-[#161622] text-gray-400 hover:bg-[#1a1a2a]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSocialUpdate}
+                    className="px-3 py-1 text-sm rounded bg-blue-500 text-white hover:bg-blue-600"
+                  >
+                    Save
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
